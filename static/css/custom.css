@@ -1,0 +1,74 @@
+/* Custom styles for Phishing Email Detector */
+
+/* Indicator score styling */
+.indicator-score {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+/* Code block styling for highlighted email content */
+.code-block {
+    background-color: var(--bs-dark);
+    color: var(--bs-light);
+    font-family: monospace;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Highlighted suspicious content */
+.suspicious-urgent {
+    background-color: rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    border-radius: 2px;
+}
+
+.suspicious-sensitive {
+    background-color: rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+    border-radius: 2px;
+}
+
+.suspicious-link {
+    background-color: rgba(13, 110, 253, 0.3);
+    color: #0d6efd;
+    border-radius: 2px;
+    text-decoration: underline;
+}
+
+.suspicious-grammar {
+    background-color: rgba(111, 66, 193, 0.3);
+    color: #6f42c1;
+    border-radius: 2px;
+}
+
+/* Risk gauge styling */
+.gauge-container {
+    position: relative;
+    max-width: 150px;
+    margin: 0 auto;
+}
+
+/* Loading spinner styling */
+#loadingIndicator {
+    padding: 2rem;
+}
+
+#loadingIndicator .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-header-tabs {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .nav-link {
+        border-radius: 0;
+        margin-bottom: 2px;
+    }
+}

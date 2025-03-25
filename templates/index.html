@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Email Detector</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Highlight.js for text highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>Phishing Email Detector
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-search me-2"></i>Analyze Suspicious Email</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="emailForm">
+                            <div class="mb-3">
+                                <label for="emailSender" class="form-label">Sender Email</label>
+                                <input type="text" class="form-control" id="emailSender" placeholder="john.doe@example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailSubject" class="form-label">Email Subject</label>
+                                <input type="text" class="form-control" id="emailSubject" placeholder="Enter the email subject">
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailContent" class="form-label">Email Content</label>
+                                <textarea class="form-control" id="emailContent" rows="8" placeholder="Paste the full email content here..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Analyze Email
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Results Section - Hidden initially -->
+        <div id="resultsContainer" class="row d-none">
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-chart-pie me-2"></i>Analysis Results</h4>
+                        <div>
+                            <span id="overallScore" class="badge bg-danger fs-5">Risk Score: 85%</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Risk level gauge -->
+                            <div class="col-md-4 text-center mb-4">
+                                <h5>Risk Level</h5>
+                                <div class="gauge-container">
+                                    <canvas id="riskGauge"></canvas>
+                                </div>
+                                <h4 id="riskLevel" class="mt-2">Medium Risk</h4>
+                            </div>
+                            
+                            <!-- Key indicators -->
+                            <div class="col-md-8">
+                                <h5>Key Indicators</h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <h6>Content Analysis</h6>
+                                                <div id="contentScore" class="indicator-score">--</div>
+                                                <p id="contentSummary" class="small">--</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <h6>URL Analysis</h6>
+                                                <div id="urlScore" class="indicator-score">--</div>
+                                                <p id="urlSummary" class="small">--</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <h6>Sender Analysis</h6>
+                                                <div id="senderScore" class="indicator-score">--</div>
+                                                <p id="senderSummary" class="small">--</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis Tabs -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="analysisTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="highlighted-tab" data-bs-toggle="tab" data-bs-target="#highlighted" type="button" role="tab" aria-controls="highlighted" aria-selected="true">
+                                    <i class="fas fa-highlighter me-2"></i>Highlighted Content
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="urls-tab" data-bs-toggle="tab" data-bs-target="#urls" type="button" role="tab" aria-controls="urls" aria-selected="false">
+                                    <i class="fas fa-link me-2"></i>URLs
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab" aria-controls="education" aria-selected="false">
+                                    <i class="fas fa-graduation-cap me-2"></i>Educational Tips
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="analysisTabsContent">
+                            <!-- Highlighted Content Tab -->
+                            <div class="tab-pane fade show active" id="highlighted" role="tabpanel" aria-labelledby="highlighted-tab">
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Suspicious parts of the email are highlighted to help you identify phishing indicators.
+                                </div>
+                                <div id="highlightedContent" class="code-block p-3 border rounded">
+                                    <p>Loading content...</p>
+                                </div>
+                            </div>
+                            
+                            <!-- URLs Tab -->
+                            <div class="tab-pane fade" id="urls" role="tabpanel" aria-labelledby="urls-tab">
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>The table below shows all URLs found in the email and their risk assessment.
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>URL</th>
+                                                <th>Risk Level</th>
+                                                <th>Reason</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="urlTable">
+                                            <tr>
+                                                <td colspan="3" class="text-center">No URLs detected</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Educational Tips Tab -->
+                            <div class="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Learn about the phishing techniques detected in this email and how to protect yourself.
+                                </div>
+                                <div id="educationalTips" class="row">
+                                    <p class="text-center">Loading educational tips...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div id="loadingIndicator" class="text-center my-5 d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Analyzing email content...</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="alert alert-danger mt-3 d-none">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span id="errorMessage">An error occurred during analysis.</span>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-shield-alt me-2"></i>Phishing Email Detector</h5>
+                    <p class="small">
+                        A tool to help identify potentially malicious emails and protect against phishing attacks.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="small">
+                        <i class="fas fa-info-circle me-2"></i>This tool analyzes email content, links, and sender information to identify potential phishing threats.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <!-- Custom Script -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
