@@ -13,7 +13,21 @@ nltk_data_dir = os.path.join(os.path.expanduser('~'), 'nltk_data')
 os.makedirs(nltk_data_dir, exist_ok=True)
 
 # Download required NLTK data packages
-nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
+try:
+    # Download punkt for tokenization
+    nltk.download('punkt', download_dir=nltk_data_dir, quiet=False)
+    
+    # Try to specifically address the punkt_tab issue
+    nltk_punkt_dir = os.path.join(nltk_data_dir, 'tokenizers', 'punkt')
+    os.makedirs(nltk_punkt_dir, exist_ok=True)
+    
+    # Force downloading of punkt again to ensure all files are present
+    nltk.download('punkt', download_dir=nltk_data_dir, force=True)
+    
+    # Log successful download
+    logger.info("Successfully downloaded NLTK punkt tokenizer data")
+except Exception as e:
+    logger.error(f"Error downloading NLTK data: {str(e)}")
 
 # Set the path for NLTK data
 nltk.data.path.append(nltk_data_dir)
@@ -199,7 +213,14 @@ def get_suspicious_phrases(text):
     
     # Tokenize into sentences
     try:
-        sentences = sent_tokenize(text)
+        # Try using NLTK's sentence tokenizer
+        try:
+            sentences = sent_tokenize(text)
+        except Exception as tok_error:
+            # Fallback to simple split on periods if NLTK tokenization fails
+            logger.warning(f"NLTK tokenization failed, using fallback: {str(tok_error)}")
+            # Simple sentence splitting as fallback
+            sentences = [s.strip() + '.' for s in text.split('.') if s.strip()]
         
         # Analyze each sentence for suspicious content
         for sentence in sentences:
@@ -215,5 +236,7 @@ def get_suspicious_phrases(text):
                 suspicious_phrases.append(sentence.strip())
     except Exception as e:
         logger.error(f"Error analyzing sentences: {str(e)}")
+        # Return an empty list in case of error
+        return []
     
     return suspicious_phrases
